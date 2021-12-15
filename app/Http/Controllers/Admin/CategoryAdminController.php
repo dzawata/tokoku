@@ -1,0 +1,164 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
+
+use App\Models\Category;
+use App\Http\Requests\Admin\CategoryRequest;
+use App\Http\Controllers\Controller;
+use Exception;
+
+class CategoryAdminController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        if (request()->ajax()) {
+
+            $query = Category::query();
+
+            return DataTables::of($query)
+                ->addColumn('action', function ($item) {
+                    return '
+                            <div class="btn btn-group">
+                                <div class="dropdown">
+                                    <button class="btn btn-info dropdown-toggle mr-1 mb-1" 
+                                    type="button" 
+                                    data-toggle="dropdown">
+                                        Aksi
+                                    </button>
+
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item" href="' . route('category.edit', $item->id) . '">Edit</a>
+                                        <form action="' . route('category.destroy', $item->id) . '" method="POST">
+                                            <button type="submit" class="dropdown-item text-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        ';
+                })
+                ->editColumn('images', function ($item) {
+                    return $item->images ? '<img src="' . Storage::url($item->images) . '" style="max-height:40px">' : '';
+                })
+                ->rawColumns(['action', 'images'])
+                ->make();
+        }
+
+        return view('pages.admin.category.index');
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        $html =
+            [
+                'fields' => '
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Nama Kategori</label>
+                                        <input type="text" id="name" name="name" class="form-control" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Gambar</label>
+                                        <input type="file" id="image" name="image" class="form-control" required>
+                                    </div>
+                                </div>    
+                            </div>
+                    </div>
+                </div>',
+                'action' => route('category.store')
+            ];
+        return response()->json([
+            'status' => true,
+            'html' => $html
+        ]);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(CategoryRequest $request)
+    {
+        try {
+            $data = $request->all();
+            $data['slug'] = Str::slug($request->name);
+            $insert = Category::create($data);
+            if ($insert) {
+                $data['images'] = $request->file('image')->store('assets/category', 'public');
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Data tersimpan'
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(CategoryRequest $request, $id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        //
+    }
+}

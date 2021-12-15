@@ -9,6 +9,8 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\SuccessController;
 use App\Http\Controllers\DashboardTransactionController;
 use App\Http\Controllers\DashboardSettingsController;
+use App\Http\Controllers\Admin\DashboardAdminController;
+use App\Http\Controllers\Admin\CategoryAdminController;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,9 +38,12 @@ Route::get('/dashboard/transactions/{id}', [DashboardTransactionController::clas
 Route::get('/dashboard/settings', [DashboardSettingsController::class, 'store'])->name('dashboard-settings');
 Route::get('/dashboard/account', [DashboardSettingsController::class, 'account'])->name('dashboard-account');
 
-// Hasil generate auth
-// Route::get('/dashboard', function () {
-//     return view('dashboard');
-// })->middleware(['auth'])->name('dashboard');
+Route::prefix('admin')
+    // ->middleware(['auth', 'admin'])
+    ->group(function () {
+        Route::get('/', [DashboardAdminController::class, 'index'])->name('admin-dashboard');
+        Route::get('/dashboard', [DashboardAdminController::class, 'index'])->name('admin-dashboard');
+        Route::resource('category', CategoryAdminController::class);
+    });
 
 require __DIR__ . '/auth.php';
