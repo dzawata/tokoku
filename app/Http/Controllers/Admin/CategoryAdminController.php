@@ -97,24 +97,31 @@ class CategoryAdminController extends Controller
      */
     public function store(CategoryRequest $request)
     {
-        try {
-            $data = $request->all();
-            $data['slug'] = Str::slug($request->name);
-            $insert = Category::create($data);
-            if ($insert) {
-                $data['images'] = $request->file('image')->store('assets/category', 'public');
-            }
+        $response = [
+            'status' => false,
+            'message' => 'Data gagal tersimpan, Kategori "' . $request->name . '" sudah ada.'
+        ];
 
-            return response()->json([
-                'status' => true,
-                'message' => 'Data tersimpan'
-            ]);
-        } catch (Exception $e) {
-            return response()->json([
-                'status' => false,
-                'message' => $e->getMessage()
-            ]);
+        $check = Category::where('slug', Str::slug($request->name))->first();
+        if (is_null($check)) {
+            try {
+                $data = $request->all();
+                $data['slug'] = Str::slug($request->name);
+                $data['images'] = $request->file('image')->store('assets/category', 'public');
+                Category::create($data);
+
+                $response = [
+                    'status' => true,
+                    'message' => 'Data tersimpan'
+                ];
+            } catch (Exception $e) {
+                $response = [
+                    'status' => false,
+                    'message' => $e->getMessage()
+                ];
+            }
         }
+        return response()->json($response);
     }
 
     /**

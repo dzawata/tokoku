@@ -106,6 +106,7 @@
             'method': 'GET',
             'dataType': 'json',
             'success': function(ret) {
+                modal.find('.alert').remove();
                 modal.find('.modal-title').html('Tambah Kategori');
                 modal.find(".form-category").attr('action', ret.html.action);
                 modal.find(".modal-body").html(ret.html.fields);
