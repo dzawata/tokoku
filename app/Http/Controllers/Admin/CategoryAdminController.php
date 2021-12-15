@@ -186,7 +186,13 @@ class CategoryAdminController extends Controller
             'status' => false,
             'message' => 'Data gagal tersimpan, Data tidak ditemukan.'
         ];
-        $category = Category::findOrFail($id);
+
+        try {
+            $category = Category::findOrFail($id);
+        } catch (Exception $e) {
+            return $response;
+        }
+
         if (!is_null($category)) {
             try {
                 $data = $request->all();
