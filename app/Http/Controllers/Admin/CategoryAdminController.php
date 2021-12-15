@@ -39,6 +39,7 @@ class CategoryAdminController extends Controller
                                     <div class="dropdown-menu">
                                         <a class="dropdown-item btn-edit" data-id="' . $item->id . '" href="javascript:void(0)">Edit</a>
                                         <form action="' . route('category.destroy', $item->id) . '" method="POST">
+                                            ' . method_field('delete') . csrf_field() . '
                                             <button type="submit" class="dropdown-item text-danger">Delete</button>
                                         </form>
                                     </div>
@@ -224,6 +225,9 @@ class CategoryAdminController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $category = Category::findOrFail($id);
+        $category->delete();
+
+        return redirect()->route('category.index');
     }
 }
