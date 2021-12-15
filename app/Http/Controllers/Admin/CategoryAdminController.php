@@ -6,6 +6,8 @@ use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
+use Illuminate\Http\Request;
+
 use App\Models\Category;
 use App\Http\Requests\Admin\CategoryRequest;
 use App\Http\Controllers\Controller;
@@ -23,7 +25,6 @@ class CategoryAdminController extends Controller
         if (request()->ajax()) {
 
             $query = Category::query();
-
             return DataTables::of($query)
                 ->addColumn('action', function ($item) {
                     return '
@@ -36,7 +37,7 @@ class CategoryAdminController extends Controller
                                     </button>
 
                                     <div class="dropdown-menu">
-                                        <a class="dropdown-item" href="' . route('category.edit', $item->id) . '">Edit</a>
+                                        <a class="dropdown-item btn-edit" data-id="' . $item->id . '" href="javascript:void(0)">Edit</a>
                                         <form action="' . route('category.destroy', $item->id) . '" method="POST">
                                             <button type="submit" class="dropdown-item text-danger">Delete</button>
                                         </form>
@@ -143,7 +144,33 @@ class CategoryAdminController extends Controller
      */
     public function edit($id)
     {
-        //
+        $id = trim($id);
+        $category = Category::findOrFail($id);
+        $html =
+            [
+                'fields' => '
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Nama Kategori</label>
+                                        <input type="text" id="name" name="name" class="form-control" value="' . $category['name'] . '" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Gambar</label>
+                                        <input type="file" id="image" name="image" class="form-control">
+                                    </div>
+                                </div>    
+                            </div>
+                    </div>
+                </div>',
+                'action' => route('category.update', $id) . "?_method=PUT"
+            ];
+        return response()->json([
+            'status' => true,
+            'html' => $html
+        ]);
     }
 
     /**
@@ -155,7 +182,32 @@ class CategoryAdminController extends Controller
      */
     public function update(CategoryRequest $request, $id)
     {
-        //
+        $response = [
+            'status' => false,
+            'message' => 'Data gagal tersimpan, Data tidak ditemukan.'
+        ];
+        $category = Category::findOrFail($id);
+        if (!is_null($category)) {
+            try {
+                $data = $request->all();
+                $data['slug'] = Str::slug($request->name);
+                if ($request->hasFile('image') && $request->file('image')->isValid()) {
+                    Storage::disk("public")->delete($category['images']);
+                    $data['images'] = $request->file('image')->store('assets/category', 'public');
+                }
+                $category->update($data);
+                $response = [
+                    'status' => true,
+                    'message' => 'Data tersimpan'
+                ];
+            } catch (Exception $e) {
+                $response = [
+                    'status' => false,
+                    'message' => $e->getMessage()
+                ];
+            }
+        }
+        return response()->json($response);
     }
 
     /**

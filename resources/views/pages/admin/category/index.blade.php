@@ -11,9 +11,6 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Modal title</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
                 </div>
                 <div class="modal-body">
                 </div>
@@ -96,7 +93,32 @@
                 searchable: false,
                 width: '15%'
             }
-        ]
+        ],
+        "drawCallback": function() {
+
+            jQuery(".btn-edit").on('click', function() {
+                var modal = jQuery("#modalCrud");
+                var id = jQuery(this).attr('data-id');
+
+                var url = "{!! route('category.edit', 'id') !!}";
+                url = url.replace('id', id);
+                jQuery.ajax({
+                    'url': url,
+                    'method': 'GET',
+                    'dataType': 'json',
+                    'success': function(ret) {
+                        modal.find('.alert').remove();
+                        modal.find('.modal-title').html('Edit Kategori');
+                        modal.find(".form-category").attr('action', ret.html.action);
+                        modal.find(".modal-body").html(ret.html.fields);
+                    }
+                })
+
+                modal.appendTo('body');
+                modal.modal('show');
+            })
+
+        }
     });
 
     jQuery(".btn-add").on('click', function() {
