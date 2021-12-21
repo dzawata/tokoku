@@ -12,6 +12,7 @@ use App\Http\Controllers\DashboardSettingsController;
 use App\Http\Controllers\Admin\DashboardAdminController;
 use App\Http\Controllers\Admin\CategoryAdminController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\ProductController;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,6 +47,7 @@ Route::prefix('admin')
         Route::get('/dashboard', [DashboardAdminController::class, 'index'])->name('admin-dashboard');
         Route::resource('category', CategoryAdminController::class);
         Route::resource('user', UserController::class);
+        Route::resource('product', ProductController::class);
     });
 
 require __DIR__ . '/auth.php';

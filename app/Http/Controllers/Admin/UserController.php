@@ -42,8 +42,8 @@ class UserController extends Controller
                             </div>
                         ';
                 })
-                ->rawColumns(['action', 'images'])
-                ->make();
+                ->rawColumns(['action'])
+                ->make(true);
         }
 
         return view('pages.admin.user.index');

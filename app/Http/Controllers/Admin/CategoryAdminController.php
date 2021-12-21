@@ -49,7 +49,7 @@ class CategoryAdminController extends Controller
                     return $item->images ? '<img src="' . Storage::url($item->images) . '" style="max-height:40px">' : '';
                 })
                 ->rawColumns(['action', 'images'])
-                ->make();
+                ->make(true);
         }
 
         return view('pages.admin.category.index');
