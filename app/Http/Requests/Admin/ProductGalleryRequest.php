@@ -24,9 +24,8 @@ class ProductGalleryRequest extends FormRequest
     public function rules()
     {
         return [
-            "image" => "required|mimes:jpg,png,jpeg,svg|max:2048",
-            "product_id" => "required|exists:products,id",
-            "users_id" => "required|exists:users,id",
+            "image" => "image|mimes:jpg,png,jpeg|max:2048",
+            "product_id" => "required|exists:products,id"
         ];
     }
 }
