@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Store;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Transactions;
 
-class DashboardAdminController extends Controller
+class DashboardStoreController extends Controller
 {
 
     public function index()
@@ -15,7 +15,7 @@ class DashboardAdminController extends Controller
         $customer = User::count();
         $revenue = Transactions::where('transaction_status', 'success')->sum('total_price');
         $transactions = Transactions::count();
-        return view('pages.admin.dashboard', [
+        return view('pages.store.dashboard', [
             'customer' => $customer,
             'revenue' => $revenue,
             'transactions' => $transactions

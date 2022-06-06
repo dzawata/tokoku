@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Store;
 
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
 use App\Models\Category;
-use App\Http\Requests\Admin\CategoryRequest;
+use App\Http\Requests\Store\CategoryRequest;
 use App\Http\Controllers\Controller;
 use Exception;
 
-class CategoryAdminController extends Controller
+class CategoryStoreController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -52,7 +52,7 @@ class CategoryAdminController extends Controller
                 ->make(true);
         }
 
-        return view('pages.admin.category.index');
+        return view('pages.store.category.index');
     }
 
     /**

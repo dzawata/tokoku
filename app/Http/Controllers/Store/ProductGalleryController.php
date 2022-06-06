@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Store;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
+use App\Models\ProductGallery;
+use App\Http\Requests\Store\ProductGalleryRequest;
 use App\Models\Product;
-use App\Http\Requests\Admin\ProductRequest;
-use App\Models\Category;
-use App\Models\User;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-class ProductController extends Controller
+class ProductGalleryController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -22,7 +22,7 @@ class ProductController extends Controller
     {
         if (request()->ajax()) {
 
-            $query = Product::with(['user', 'category']);
+            $query = ProductGallery::with(['product']);
             return DataTables::of($query)
                 ->addColumn('action', function ($item) {
                     return '
@@ -35,8 +35,7 @@ class ProductController extends Controller
                                     </button>
 
                                     <div class="dropdown-menu">
-                                        <a class="dropdown-item" href="' . route('product.edit', $item->id) . '">Edit</a>
-                                        <form action="' . route('product.destroy', $item->id) . '" method="POST">
+                                        <form action="' . route('product-gallery.destroy', $item->id) . '" method="POST">
                                             ' . method_field('delete') . csrf_field() . '
                                             <button type="submit" class="dropdown-item text-danger">Delete</button>
                                         </form>
@@ -45,12 +44,14 @@ class ProductController extends Controller
                             </div>
                         ';
                 })
-                ->addIndexColumn()
-                ->rawColumns(['action'])
-                ->make(true);
+                ->editColumn('image', function ($item) {
+                    return $item->image ? '<img src="' . Storage::url($item->image) . '" style="max-height:80px" />' : '';
+                })
+                ->rawColumns(['action', 'image'])
+                ->make();
         }
 
-        return view('pages.admin.product.index');
+        return view('pages.store.product-gallery.index');
     }
 
     /**
@@ -60,12 +61,10 @@ class ProductController extends Controller
      */
     public function create()
     {
-        $users = User::all();
-        $categories = Category::all();
+        $product = Product::all();
 
-        return view('pages.admin.product.create', [
-            'users' => $users,
-            'categories' => $categories
+        return view('pages.store.product-gallery.create', [
+            'products' => $product
         ]);
     }
 
@@ -75,13 +74,13 @@ class ProductController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(ProductRequest $request)
+    public function store(ProductGalleryRequest $request)
     {
         $data = $request->all();
-        $data['slug'] = Str::slug($request->name);
-        Product::create($data);
+        $data['image'] = $request->file('image')->store('assets/product-gallery', 'public');
+        ProductGallery::create($data);
 
-        return redirect()->route('product.index');
+        return redirect()->route('product-gallery.index');
     }
 
     /**
@@ -92,7 +91,6 @@ class ProductController extends Controller
      */
     public function show($id)
     {
-        //
     }
 
     /**
@@ -103,14 +101,6 @@ class ProductController extends Controller
      */
     public function edit($id)
     {
-        $product = Product::findOrFail($id);
-        $users = User::all();
-        $categories = Category::all();
-        return view('pages.admin.product.edit', [
-            'product' => $product,
-            'users' => $users,
-            'categories' => $categories,
-        ]);
     }
 
     /**
@@ -122,11 +112,6 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $data = $request->all();
-        $product = Product::findOrFail($id);
-        $product->update($data);
-
-        return redirect()->route('product.index');
     }
 
     /**
@@ -137,9 +122,9 @@ class ProductController extends Controller
      */
     public function destroy($id)
     {
-        $product = Product::findOrFail($id);
+        $product = ProductGallery::findOrFail($id);
         $product->delete();
 
-        return redirect()->route('product.index');
+        return redirect()->route('product-gallery.index');
     }
 }

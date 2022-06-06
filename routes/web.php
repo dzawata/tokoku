@@ -6,14 +6,13 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DashboardProductsController;
 use App\Http\Controllers\CartController;
-use App\Http\Controllers\SuccessController;
 use App\Http\Controllers\DashboardTransactionController;
 use App\Http\Controllers\DashboardSettingsController;
-use App\Http\Controllers\Admin\DashboardAdminController;
-use App\Http\Controllers\Admin\CategoryAdminController;
-use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Admin\ProductController;
-use App\Http\Controllers\Admin\ProductGalleryController;
+use App\Http\Controllers\Store\DashboardStoreController;
+use App\Http\Controllers\Store\CategoryStoreController;
+use App\Http\Controllers\Store\UserController;
+use App\Http\Controllers\Store\ProductController;
+use App\Http\Controllers\Store\ProductGalleryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,12 +42,13 @@ Route::get('/dashboard/transactions/{id}', [DashboardTransactionController::clas
 Route::get('/dashboard/settings', [DashboardSettingsController::class, 'store'])->name('dashboard-settings');
 Route::get('/dashboard/account', [DashboardSettingsController::class, 'account'])->name('dashboard-account');
 
-Route::prefix('admin')
-    ->middleware(['auth', 'admin'])
+Route::prefix('store')
+    ->middleware(['auth', 'store'])
     ->group(function () {
-        Route::get('/', [DashboardAdminController::class, 'index'])->name('admin-dashboard');
-        Route::get('/dashboard', [DashboardAdminController::class, 'index'])->name('admin-dashboard');
-        Route::resource('category', CategoryAdminController::class);
+        Route::get('/', [DashboardStoreController::class, 'index'])->name('store-dashboard');
+        Route::get('/dashboard', [DashboardStoreController::class, 'index'])->name('store-dashboard');
+        Route::get('/setting', [StoreSettingController::class, 'index'])->name('store-settings');
+        Route::resource('category', CategoryStoreController::class);
         Route::resource('user', UserController::class);
         Route::resource('product', ProductController::class);
         Route::resource('product-gallery', ProductGalleryController::class);

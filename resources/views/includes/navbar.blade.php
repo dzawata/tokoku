@@ -36,8 +36,14 @@
                 Hi, {{ Auth::user()->name }}
               </a>
               <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                @if( Auth::user()->store_status && Auth::user()->store_status==1 )
+                <a class="dropdown-item" href="{{ route('store-dashboard') }}">Dashboard+</a>
+                <a class="dropdown-item" href="{{ route('store-settings') }}">Settings</a>
+                @endif
+                @if( Auth::user()->store_status!=1 )
                 <a class="dropdown-item" href="{{ route('dashboard') }}">Dashboard</a>
                 <a class="dropdown-item" href="{{ route('dashboard-settings') }}">Settings</a>
+                @endif
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit()">Logout</a>
                 <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">

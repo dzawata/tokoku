@@ -66,4 +66,9 @@ class RegisteredUserController extends Controller
     {
         return view('pages.success-registered');
     }
+
+    public function emailCheck(Request $request)
+    {
+        return User::where('email', $request->email)->count() > 0 ? 'Not available' : 'Available';
+    }
 }
